@@ -43,16 +43,18 @@ from pygit2_helpers import shortlog_is_revert, shortlog_reverts_what, \
 # -----------------------------------------------------------
 AREA_TO_SHORTLOG_RES = [
     ('Arches', ['arch(/.*)?', 'arc(/.*)?', 'arm(/.*)?', 'esp32(/.*)?',
-                'native(/.*)?', 'native_posix', 'nios2(/.*)?', 'posix(/.*)?',
-                'lpc(/.*)?', 'riscv(32)?(/.*)?', 'soc(/.*)?', 'x86(/.*)?',
-                'xtensa(/.*)?']),
+                'imx(/.*)?', 'native(/.*)?', 'native_posix', 'nios2(/.*)?',
+                'posix(/.*)?', 'lpc(/.*)?', 'riscv(32)?(/.*)?', 'soc(/.*)?',
+                'x86(_64)?(/.*)?', 'xtensa(/.*)?']),
     ('Bluetooth', ['bluetooth', 'bt']),
     ('Boards', ['boards?(/.*)?', 'mimxrt1050_evk']),
-    ('Build', ['build', 'clang(/.*)?', 'cmake', 'kconfig', 'gen_isr_tables?',
-               'gen_syscall_header', 'genrest', 'isr_tables?',
-               'ld', 'linker', 'menuconfig', 'size_report', 'toolchains?']),
+    ('Build', ['build', 'c[+][+]', 'clang(/.*)?', 'cmake', 'kconfig',
+               'gen_isr_tables?', 'gen_syscall_header', 'genrest',
+               'isr_tables?', 'ld', 'linker', 'menuconfig', 'size_report',
+               'toolchains?']),
     ('Continuous Integration', ['ci', 'coverage', 'sanitycheck', 'gitlint']),
     ('Cryptography', ['crypto', 'mbedtls']),
+    ('Debugging', ['debug']),
     ('Device Tree', ['dt', 'dts(/.*)?', 'dt-bindings',
                      'extract_dts_includes?']),
     ('Documentation', ['docs?(/.*)?', 'CONTRIBUTING.rst', 'doxygen']),
@@ -60,26 +62,29 @@ AREA_TO_SHORTLOG_RES = [
                  'adc', 'aio', 'can', 'clock_control', 'counter', 'crc',
                  'device([.]h)?', 'display', 'dma', 'entropy', 'eth',
                  'ethernet',
-                 'flash', 'gpio', 'grove', 'hid', 'i2c', 'i2s',
+                 'flash', 'flash_map', 'gpio', 'grove', 'hid', 'i2c', 'i2s',
                  'interrupt_controller', 'ipm', 'led_strip', 'led', 'netusb',
-                 'pci', 'pinmux', 'pwm', 'rtc', 'sensors?(/.*)?', 'serial',
-                 'shared_irq', 'spi', 'timer', 'uart', 'uart_pipe',
-                 'usb(/.*)?', 'watchdog',
+                 'pci', 'pinmux', 'pwm', 'rtc', 'sensors?(/.*)?',
+                 'serial(/.*)?', 'shared_irq', 'spi', 'timer', 'uart',
+                 'uart_pipe', 'usb(/.*)?', 'watchdog',
                  # Technically in subsys/ (or parts are), but treated
                  # as drivers
                  'console', 'random', 'storage']),
     ('External', ['ext(/.*)?', 'hal', 'stm32cube']),
-    ('Firmware Update', ['dfu', 'mgmt']),
-    ('Kernel',  ['kernel(/.*)?', 'poll', 'mempool', 'syscalls', 'work_q',
-                 'init.h', 'userspace', 'k_queue', 'k_poll', 'app_memory']),
-    ('Libraries', ['libc?', 'json', 'ring_buffer', 'lib(/.*)']),
+    ('Firmware Update', ['dfu(/.*)?', 'mgmt']),
+    ('Kernel',  ['kernel(/.*)?', 'poll', 'mempool', 'spinlock', 'syscalls',
+                 'work_q', 'init.h', 'userspace', 'k_queue', 'k_poll',
+                 'app_memory']),
+    ('Libraries', ['libc?', 'json', 'jwt', 'ring_buffer', 'lib(/.*)',
+                   'misc/dlist']),
     ('Logging', ['logging', 'logger', 'log']),
     ('Maintainers', ['CODEOWNERS([.]rst)?']),
     ('Miscellaneous', ['misc', 'release', 'shell', 'printk', 'version']),
-    ('Networking', ['net(/.*)?', 'openthread', 'slip']),
+    ('Networking', ['net(/.*)?', 'openthread', 'slip', 'ieee802154']),
     ('Power Management', ['power']),
     ('Samples', ['samples?(/.*)?']),
-    ('Scripts', ['scripts?(/.*)?', 'coccinelle', 'runner', 'gen_syscalls.py',
+    ('Scripts', ['scripts?(/.*)?', 'coccinelle', 'runner',
+                 'gen_app_partitions(.py)?', 'gen_syscalls.py',
                  'gen_syscall_header.py', 'kconfiglib', 'west']),
     ('Storage', ['fs(/.*)?', 'disks?', 'fcb', 'settings']),
     ('Testing', ['tests?(/.*)?', 'testing', 'unittest', 'ztest', 'tracing']),
@@ -151,7 +156,7 @@ def shortlog_area_prefix(shortlog):
     area, rest = [s.strip() for s in shortlog.split(':', 1)]
 
     # subsys: foo should map to foo's area prefix, etc.
-    if area in ['subsys', 'include']:
+    if area in ['subsys', 'include', 'api']:
         return shortlog_area_prefix(rest)
 
     return area
