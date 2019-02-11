@@ -27,8 +27,8 @@ import sys
 import textwrap
 import time
 
-from . import AREAS, ZephyrRepoAnalyzer, UnknownCommitsError
-from .pygit2_helpers import commit_shortsha, commit_shortlog
+from zephyr_helpers import AREAS, ZephyrRepoAnalyzer, UnknownCommitsError
+from pygit2_helpers import commit_shortsha, commit_shortlog
 
 
 #
@@ -197,7 +197,7 @@ class ZephyrMergeupFormatter(ZephyrTextFormatMixin, ZephyrOutputFormatter):
 
     def preamble(self, analysis, context):
         return [
-            "[FIO mergeup] Merge 'zephyrproject-rtos/master' into 'osf-dev/master'",  # noqa: E501
+            "[FIO mergeup] Merge 'zephyrproject-rtos/master' into 'foundriesio/master'",  # noqa: E501
             ''
             ]
 
@@ -335,9 +335,8 @@ def main(args):
         repo_path = os.getcwd()
 
     analyzer = ZephyrRepoAnalyzer(repo_path, args.downstream_ref,
-                                  ('OSF', 'FIO'),
-                                  ('@opensourcefoundries.com',
-                                   '@foundries.io'),
+                                  ('FIO',),
+                                  ('@foundries.io',),
                                   args.upstream_ref,
                                   sha_to_area=args.sha_to_area,
                                   area_by_shortlog=args.area_by_shortlog)
@@ -371,12 +370,10 @@ if __name__ == '__main__':
                                      script. This script currently just
                                      prints the mergeup commit message.''')
     group = parser.add_argument_group('repository options')
-    group.add_argument('--downstream-ref', default='osf-dev/master',
+    group.add_argument('--downstream-ref', default='foundriesio/master',
                        help='''downstream git revision (commit-ish) to analyze
-                       upstream differences with. Default is osf-dev/master
-                       [sic; this is a legacy from the OSF days].''')
-    group.add_argument('--fio-ref', dest='downstream_ref',
-                       help=argparse.SUPPRESS)  # For backwards compatibility
+                       upstream differences with. Default is
+                       foundriesio/master.''')
     group.add_argument('--upstream-ref', default='upstream/master',
                        help='''Upstream ref (commit-ish) whose differences
                        with --downstream-ref to analyze. Default is
@@ -400,8 +397,6 @@ if __name__ == '__main__':
     group.add_argument('--areas', action='store_true',
                        help='''Print all areas that upstream commits are
                        grouped into in mergeup commit logs, and exit.''')
-    group.add_argument('--self-test', action='store_true',
-                       help=argparse.SUPPRESS)  # for backwards compatibility
 
     parser.add_argument('repo', nargs='?',
                         help='''Path to the zephyr repository. If not given,
@@ -409,8 +404,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if args.self_test:
-        sys.exit('this is deprecated; use "py.test test_*.py" instead')
     if args.areas:
         print('\n'.join(AREAS))
         sys.exit(0)
