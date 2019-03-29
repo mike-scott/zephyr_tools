@@ -86,7 +86,7 @@ def print_notes(start_manifest, end_manifest):
         ncommits = len(commits)
 
         if ncommits >= 2:
-            sc, ec = commits[0], commits[-1]
+            sc, ec = commits[-1], commits[0]
             changes = '''\
 {} patches total:
 
